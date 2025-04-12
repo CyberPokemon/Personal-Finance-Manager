@@ -1,8 +1,11 @@
 package com.neuromancers.personalfinancemanager;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -35,6 +38,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+import java.util.Calendar;
+
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -142,19 +149,82 @@ public class HomeActivity extends AppCompatActivity {
         Spinner spinnerType = view.findViewById(R.id.spinner_type);
         EditText edtDescription = view.findViewById(R.id.edt_description);
         EditText edtPerson = view.findViewById(R.id.edt_person);
-        EditText edtAccount = view.findViewById(R.id.edt_account);
+        Spinner spinnerAccount = view.findViewById(R.id.spinner_account);
+        EditText edtDateTime = view.findViewById(R.id.edt_datetime);
         Button btnSubmit = view.findViewById(R.id.btn_submit);
+
+
+        List<String> accountList = new ArrayList<>();
+        accountList.add("Cash");
+        List<BankAccount> userAccounts = dbHelper.getBankAccounts(currentUserId);
+        for (BankAccount acc : userAccounts) {
+            accountList.add(acc.getBankName());
+        }
+
+        ArrayAdapter<String> accountAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, accountList);
+        accountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerAccount.setAdapter(accountAdapter);
+
+
+        edtDateTime.setFocusable(false);
+
+        edtDateTime.setOnClickListener(v -> {
+            Calendar calendar;
+            calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
+
+            // Create DatePickerDialog
+            DatePickerDialog datePickerDialog = new DatePickerDialog(this,
+                    (view1, selectedYear, selectedMonth, selectedDay) -> {
+                        // Set up TimePickerDialog after Date is selected
+                        Calendar selectedCalendar = Calendar.getInstance();
+                        selectedCalendar.set(selectedYear, selectedMonth, selectedDay);
+
+                        // Prevent selecting future dates
+                        if (selectedCalendar.after(Calendar.getInstance())) {
+                            Toast.makeText(this, "Cannot select future dates", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        // Time picker
+                        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+                        int minute = calendar.get(Calendar.MINUTE);
+
+                        TimePickerDialog timePickerDialog = new TimePickerDialog(this,
+                                (view2, selectedHour, selectedMinute) -> {
+                                    selectedCalendar.set(Calendar.HOUR_OF_DAY, selectedHour);
+                                    selectedCalendar.set(Calendar.MINUTE, selectedMinute);
+
+                                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                                    String dateTime = dateFormat.format(selectedCalendar.getTime());
+                                    edtDateTime.setText(dateTime);
+                                }, hour, minute, true);
+
+                        timePickerDialog.show();
+                    }, year, month, day);
+
+            datePickerDialog.getDatePicker().setMaxDate(System.currentTimeMillis());
+
+            datePickerDialog.show();
+        });
 
         AlertDialog dialog = builder.create();
 
         btnSubmit.setOnClickListener(v -> {
-            // collect values and insert into DB
             double amount = Double.parseDouble(edtAmount.getText().toString());
             String type = spinnerType.getSelectedItem().toString();
             String description = edtDescription.getText().toString();
             String person = edtPerson.getText().toString();
-            String account = edtAccount.getText().toString();
-            String datetime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+            String account = spinnerAccount.getSelectedItem().toString();
+            String datetime = edtDateTime.getText().toString();  // Get selected datetime
+
+            // Check if date is selected
+            if (datetime.isEmpty()) {
+                Toast.makeText(this, "Please select a valid date and time.", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             boolean success = dbHelper.insertTransaction(currentUserId, amount, type, datetime, description, person, account);
 
@@ -165,13 +235,11 @@ public class HomeActivity extends AppCompatActivity {
             } else {
                 Toast.makeText(this, "Transaction failed", Toast.LENGTH_SHORT).show();
             }
-
-            updateChart(); // refresh pie chart
-            dialog.dismiss();
         });
 
         dialog.show();
     }
+
 
     private void updateChart() {
         PieChart pieChart = findViewById(R.id.pieChart);
