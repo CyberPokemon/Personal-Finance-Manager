@@ -14,6 +14,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "finance_app.db";
     public static final int DB_VERSION = 2;
 
+    private static final String CREATE_TABLE_FD = "CREATE TABLE IF NOT EXISTS fd (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "user_id INTEGER," +
+            "principal REAL," +
+            "rate REAL," +
+            "time_months INTEGER," +
+            "start_date TEXT," +
+            "maturity_date TEXT," +
+            "interest REAL," +
+            "maturity_amount REAL)";
+
+
     public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
     }
@@ -48,7 +60,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "person TEXT, " +
                 "account_name TEXT, " +
                 "FOREIGN KEY(user_id) REFERENCES user(id))");
+
+        db.execSQL(CREATE_TABLE_FD);
+
+
+
     }
+
+    public boolean insertFD(long userId, double principal, double rate, int timeMonths,
+                            String startDate, String maturityDate, double interest, double maturityAmount) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("user_id", userId);
+        values.put("principal", principal);
+        values.put("rate", rate);
+        values.put("time_months", timeMonths);
+        values.put("start_date", startDate);
+        values.put("maturity_date", maturityDate);
+        values.put("interest", interest);
+        values.put("maturity_amount", maturityAmount);
+
+        long result = db.insert("fd", null, values);
+        return result != -1;
+    }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
