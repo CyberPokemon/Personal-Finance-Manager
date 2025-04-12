@@ -43,6 +43,7 @@ import java.util.Locale;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.Calendar;
+import android.content.Intent;
 
 
 public class HomeActivity extends AppCompatActivity {
@@ -62,6 +63,14 @@ public class HomeActivity extends AppCompatActivity {
 
         infotext=findViewById(R.id.infotext);
         infotext.setText("Money Distribution");
+
+        Button btnAssets = findViewById(R.id.btn_manage_assets);
+        btnAssets.setOnClickListener(v -> {
+            Intent intent = new Intent(HomeActivity.this, AssetsActivity.class);
+            startActivity(intent);
+        });
+
+
         dbHelper = new DatabaseHelper(this);
         currentUserId = dbHelper.getLastInsertedUserId();
         User user = dbHelper.getUser(currentUserId);

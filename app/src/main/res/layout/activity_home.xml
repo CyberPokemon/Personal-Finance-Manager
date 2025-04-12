@@ -42,6 +42,17 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <Button
+        android:id="@+id/btn_manage_assets"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:text="Manage FDs / Loans"
+        android:backgroundTint="@color/blue"
+        android:textColor="@android:color/white"/>
+
+
     <!-- RecyclerView with weight to take remaining space -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_transactions"
