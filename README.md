@@ -15,7 +15,7 @@
 
 - **Android Studio** – Native Android development environment
 - **Java** – Core programming language
-- **Offline Storage** – Secure local data handling
+- **Offline Storage (SQL Lite)** – Secure local data handling
 - **MPAndroidChart** – Data visualization
 - **AndroidX & Jetpack Libraries** – Modern development components
 
