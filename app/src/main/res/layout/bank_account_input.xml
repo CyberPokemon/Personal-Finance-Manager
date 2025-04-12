@@ -1,0 +1,46 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="8dp"
+    android:background="#f1f1f1"
+    android:layout_marginBottom="16dp">
+
+    <EditText
+        android:id="@+id/input_bank_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Bank Name" />
+
+    <EditText
+        android:id="@+id/input_account_number"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Last 4 Digits of Account No."
+        android:inputType="number"
+        android:maxLength="4" />
+
+    <EditText
+        android:id="@+id/input_ifsc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="IFSC Code" />
+
+    <EditText
+        android:id="@+id/input_balance"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Account Balance"
+        android:inputType="numberDecimal" />
+
+    <Button
+        android:id="@+id/btn_delete_account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete Account"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#D32F2F"
+        android:layout_marginTop="8dp"
+        android:layout_gravity="end" />
+
+</LinearLayout>
