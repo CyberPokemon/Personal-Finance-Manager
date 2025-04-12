@@ -59,6 +59,27 @@ public class CashInputActivity extends AppCompatActivity {
 
             // All inputs are valid, proceed to next activity
             Intent intent = new Intent(CashInputActivity.this, SetPinActivity.class);
+            intent.putExtra("name", getIntent().getStringExtra("name"));
+            intent.putExtra("dob", getIntent().getStringExtra("dob"));
+            intent.putExtra("address", getIntent().getStringExtra("address"));
+            intent.putExtra("cash", Double.parseDouble(cash));
+            BankDataHolder.getInstance().clear(); // optional for cleanup
+            for (int i = 0; i < bankAccountsContainer.getChildCount(); i++) {
+                View view = bankAccountsContainer.getChildAt(i);
+                EditText bankName = view.findViewById(R.id.input_bank_name);
+                EditText accNum = view.findViewById(R.id.input_account_number);
+                EditText ifsc = view.findViewById(R.id.input_ifsc);
+                EditText balance = view.findViewById(R.id.input_balance);
+
+                BankDataHolder.getInstance().addAccount(
+                        new BankAccount(
+                                bankName.getText().toString(),
+                                accNum.getText().toString(),
+                                ifsc.getText().toString(),
+                                Double.parseDouble(balance.getText().toString())
+                        )
+                );
+            }
             startActivity(intent);
         });
     }
