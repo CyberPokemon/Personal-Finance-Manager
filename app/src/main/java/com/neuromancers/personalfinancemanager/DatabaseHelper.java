@@ -2,8 +2,12 @@ package com.neuromancers.personalfinancemanager;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -63,4 +67,53 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put("balance", balance);
         db.insert("bank_account", null, values);
     }
+
+    public long getLastInsertedUserId() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT id FROM user ORDER BY id DESC LIMIT 1", null);
+        if (cursor.moveToFirst()) {
+            return cursor.getLong(0);
+        }
+        cursor.close();
+        return -1; // invalid id
+    }
+
+    public User getUser(long userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM user WHERE id = ?", new String[]{String.valueOf(userId)});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            String name = cursor.getString(cursor.getColumnIndexOrThrow("name"));
+            String dob = cursor.getString(cursor.getColumnIndexOrThrow("dob"));
+            String address = cursor.getString(cursor.getColumnIndexOrThrow("address"));
+            double cash = cursor.getDouble(cursor.getColumnIndexOrThrow("cash"));
+
+            cursor.close();
+            return new User(userId, name, dob, address, cash);
+        }
+
+        return null;
+    }
+
+
+    public List<BankAccount> getBankAccounts(long userId) {
+        List<BankAccount> accountList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM bank_account WHERE user_id = ?", new String[]{String.valueOf(userId)});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                String bankName = cursor.getString(cursor.getColumnIndexOrThrow("bank_name"));
+                String accNum = cursor.getString(cursor.getColumnIndexOrThrow("account_number"));
+                String ifsc = cursor.getString(cursor.getColumnIndexOrThrow("ifsc"));
+                double balance = cursor.getDouble(cursor.getColumnIndexOrThrow("balance"));
+
+                accountList.add(new BankAccount(bankName, accNum, ifsc, balance));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        return accountList;
+    }
+
 }
