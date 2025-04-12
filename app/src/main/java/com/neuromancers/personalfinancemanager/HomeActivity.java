@@ -21,6 +21,8 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 
 import com.github.mikephil.charting.animation.Easing;
@@ -49,6 +51,9 @@ public class HomeActivity extends AppCompatActivity {
     long currentUserId;
     Toolbar toolbar;
     TextView infotext;
+    RecyclerView recyclerView;
+    TransactionAdapter transactionAdapter;
+    List<Transaction> transactionList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -136,6 +141,13 @@ public class HomeActivity extends AppCompatActivity {
 
         FloatingActionButton fab = findViewById(R.id.fab_add_transaction);
         fab.setOnClickListener(v -> showAddTransactionDialog());
+
+        recyclerView = findViewById(R.id.recycler_transactions);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        transactionList = dbHelper.getAllTransactions(currentUserId); // method must return list sorted by datetime DESC
+        transactionAdapter = new TransactionAdapter(transactionList);
+        recyclerView.setAdapter(transactionAdapter);
 
 
     }
@@ -232,6 +244,10 @@ public class HomeActivity extends AppCompatActivity {
                 updateChart();
                 Toast.makeText(this, "Transaction success", Toast.LENGTH_SHORT).show();
                 dialog.dismiss();
+                transactionList.clear();
+                transactionList.addAll(dbHelper.getAllTransactions(currentUserId));
+                transactionAdapter.notifyDataSetChanged();
+
             } else {
                 Toast.makeText(this, "Transaction failed", Toast.LENGTH_SHORT).show();
             }

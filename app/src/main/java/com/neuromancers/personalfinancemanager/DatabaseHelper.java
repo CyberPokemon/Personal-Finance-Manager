@@ -174,5 +174,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+    public List<Transaction> getAllTransactions(long userId) {
+        List<Transaction> transactionList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM transaction_log WHERE user_id = ? ORDER BY datetime DESC",
+                new String[]{String.valueOf(userId)});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                long id = cursor.getLong(cursor.getColumnIndexOrThrow("id"));
+                double amount = cursor.getDouble(cursor.getColumnIndexOrThrow("amount"));
+                String type = cursor.getString(cursor.getColumnIndexOrThrow("type"));
+                String datetime = cursor.getString(cursor.getColumnIndexOrThrow("datetime"));
+                String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
+                String person = cursor.getString(cursor.getColumnIndexOrThrow("person"));
+                String accountName = cursor.getString(cursor.getColumnIndexOrThrow("account_name"));
+
+                transactionList.add(new Transaction(id, userId, amount, type, datetime, description, person, accountName));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        return transactionList;
+    }
+
 
 }
