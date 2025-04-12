@@ -12,7 +12,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "finance_app.db";
-    public static final int DB_VERSION = 1;
+    public static final int DB_VERSION = 2;
 
     public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -36,6 +36,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "account_number TEXT, " +
                 "ifsc TEXT, " +
                 "balance REAL, " +
+                "FOREIGN KEY(user_id) REFERENCES user(id))");
+
+        db.execSQL("CREATE TABLE transaction_log (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                "user_id INTEGER, " +
+                "amount REAL, " +
+                "type TEXT, " +
+                "datetime TEXT, " +
+                "description TEXT, " +
+                "person TEXT, " +
+                "account_name TEXT, " +
                 "FOREIGN KEY(user_id) REFERENCES user(id))");
     }
 
@@ -115,5 +126,78 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return accountList;
     }
+
+    public boolean insertTransaction(long userId, double amount, String type, String datetime,
+                                     String description, String person, String accountName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.beginTransaction();
+        try {
+            ContentValues values = new ContentValues();
+            values.put("user_id", userId);
+            values.put("amount", amount);
+            values.put("type", type);
+            values.put("datetime", datetime);
+            values.put("description", description);
+            values.put("person", person);
+            values.put("account_name", accountName);
+
+            long result = db.insert("transaction_log", null, values);
+
+            if (result == -1) {
+                return false;
+            }
+
+            if (accountName.equalsIgnoreCase("Cash")) {
+                if (type.equalsIgnoreCase("outgoing")) {
+                    db.execSQL("UPDATE user SET cash = cash - ? WHERE id = ?", new Object[]{amount, userId});
+                } else if (type.equalsIgnoreCase("incoming")) {
+                    db.execSQL("UPDATE user SET cash = cash + ? WHERE id = ?", new Object[]{amount, userId});
+                }
+            } else {
+                if (type.equalsIgnoreCase("outgoing")) {
+                    db.execSQL("UPDATE bank_account SET balance = balance - ? WHERE user_id = ? AND bank_name = ?",
+                            new Object[]{amount, userId, accountName});
+                } else if (type.equalsIgnoreCase("incoming")) {
+                    db.execSQL("UPDATE bank_account SET balance = balance + ? WHERE user_id = ? AND bank_name = ?",
+                            new Object[]{amount, userId, accountName});
+                }
+            }
+
+            db.setTransactionSuccessful();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+
+    public List<Transaction> getAllTransactions(long userId) {
+        List<Transaction> transactionList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM transaction_log WHERE user_id = ? ORDER BY datetime DESC",
+                new String[]{String.valueOf(userId)});
+
+        if (cursor != null && cursor.moveToFirst()) {
+            do {
+                long id = cursor.getLong(cursor.getColumnIndexOrThrow("id"));
+                double amount = cursor.getDouble(cursor.getColumnIndexOrThrow("amount"));
+                String type = cursor.getString(cursor.getColumnIndexOrThrow("type"));
+                String datetime = cursor.getString(cursor.getColumnIndexOrThrow("datetime"));
+                String description = cursor.getString(cursor.getColumnIndexOrThrow("description"));
+                String person = cursor.getString(cursor.getColumnIndexOrThrow("person"));
+                String accountName = cursor.getString(cursor.getColumnIndexOrThrow("account_name"));
+
+                transactionList.add(new Transaction(id, userId, amount, type, datetime, description, person, accountName));
+            } while (cursor.moveToNext());
+            cursor.close();
+        }
+
+        return transactionList;
+    }
+
 
 }
