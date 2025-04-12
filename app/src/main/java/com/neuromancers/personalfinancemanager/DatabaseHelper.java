@@ -12,7 +12,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "finance_app.db";
-    public static final int DB_VERSION = 2;
+    public static final int DB_VERSION = 1;
 
     public DatabaseHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -37,18 +37,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 "ifsc TEXT, " +
                 "balance REAL, " +
                 "FOREIGN KEY(user_id) REFERENCES user(id))");
-
-        //transaction logs
-        db.execSQL("CREATE TABLE transaction_log (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                "user_id INTEGER, " +
-                "amount REAL, " +
-                "type TEXT, " + // 'incoming' or 'outgoing'
-                "datetime TEXT, " +
-                "description TEXT, " +
-                "person TEXT, " + // from/to whom
-                "account_name TEXT, " + // from/to which account
-                "FOREIGN KEY(user_id) REFERENCES user(id))");
     }
 
     @Override
@@ -56,7 +44,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         // Handle DB upgrade
         db.execSQL("DROP TABLE IF EXISTS user");
         db.execSQL("DROP TABLE IF EXISTS bank_account");
-        db.execSQL("DROP TABLE IF EXISTS transaction_log");
         onCreate(db);
     }
 
@@ -128,50 +115,5 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return accountList;
     }
-
-    public void insertTransaction(long userId, double amount, String type, String datetime,
-                                  String description, String person, String accountName) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put("user_id", userId);
-        values.put("amount", amount);
-        values.put("type", type);
-        values.put("datetime", datetime);
-        values.put("description", description);
-        values.put("person", person);
-        values.put("account_name", accountName);
-        db.insert("transaction_log", null, values);
-    }
-
-
-    public List<Transaction> getTransactionsForUser(long userId) {
-        List<Transaction> transactionList = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-
-        Cursor cursor = db.rawQuery("SELECT * FROM transaction_log WHERE user_id = ? ORDER BY datetime DESC",
-                new String[]{String.valueOf(userId)});
-
-
-        if (cursor != null && cursor.moveToFirst()) {
-            do {
-                Transaction transaction = new Transaction();
-                transaction.setId(cursor.getLong(cursor.getColumnIndexOrThrow("id")));
-                transaction.setUserId(cursor.getLong(cursor.getColumnIndexOrThrow("user_id")));
-                transaction.setAmount(cursor.getDouble(cursor.getColumnIndexOrThrow("amount")));
-                transaction.setType(cursor.getString(cursor.getColumnIndexOrThrow("type")));
-                transaction.setDatetime(cursor.getString(cursor.getColumnIndexOrThrow("datetime")));
-                transaction.setDescription(cursor.getString(cursor.getColumnIndexOrThrow("description")));
-                transaction.setPerson(cursor.getString(cursor.getColumnIndexOrThrow("person")));
-                transaction.setAccount(cursor.getString(cursor.getColumnIndexOrThrow("account_name")));
-
-                transactionList.add(transaction);
-            } while (cursor.moveToNext());
-
-            cursor.close();
-        }
-
-        return transactionList;
-    }
-
 
 }

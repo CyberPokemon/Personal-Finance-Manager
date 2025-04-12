@@ -1,9 +1,3 @@
 <resources>
     <string name="app_name">Personal Finance Manager</string>
-
-    <string-array name="transaction_types">
-        <item>Incoming</item>
-        <item>Outgoing</item>
-    </string-array>
-
 </resources>
