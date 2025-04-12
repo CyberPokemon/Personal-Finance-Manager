@@ -1,0 +1,30 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <EditText android:id="@+id/edt_amount"
+        android:hint="Amount" android:inputType="numberDecimal"
+        android:layout_width="match_parent" android:layout_height="wrap_content" />
+
+    <Spinner android:id="@+id/spinner_type"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:entries="@array/transaction_types" />
+
+    <EditText android:id="@+id/edt_description"
+        android:hint="Description"
+        android:layout_width="match_parent" android:layout_height="wrap_content" />
+
+    <EditText android:id="@+id/edt_person"
+        android:hint="From/To Whom"
+        android:layout_width="match_parent" android:layout_height="wrap_content" />
+
+    <EditText android:id="@+id/edt_account"
+        android:hint="Account Name"
+        android:layout_width="match_parent" android:layout_height="wrap_content" />
+
+    <Button android:id="@+id/btn_submit"
+        android:text="Submit"
+        android:layout_width="match_parent" android:layout_height="wrap_content" />
+</LinearLayout>
