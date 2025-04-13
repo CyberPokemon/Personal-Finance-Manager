@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     public static final String DB_NAME = "finance_app.db";
-    public static final int DB_VERSION = 2;
+    public static final int DB_VERSION = 3;
 
     private static final String CREATE_TABLE_FD = "CREATE TABLE IF NOT EXISTS fd (" +
             "id INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -69,6 +70,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     public boolean insertFD(long userId, double principal, double rate, int timeMonths,
                             String startDate, String maturityDate, double interest, double maturityAmount) {
+
+        Log.d("FD_SAVE", "User ID: " + userId);
+
+
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("user_id", userId);

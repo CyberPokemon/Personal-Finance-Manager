@@ -64,15 +64,18 @@ public class HomeActivity extends AppCompatActivity {
         infotext=findViewById(R.id.infotext);
         infotext.setText("Money Distribution");
 
+        dbHelper = new DatabaseHelper(this);
+        currentUserId = dbHelper.getLastInsertedUserId();
+
         Button btnAssets = findViewById(R.id.btn_manage_assets);
         btnAssets.setOnClickListener(v -> {
             Intent intent = new Intent(HomeActivity.this, AssetsActivity.class);
+            intent.putExtra("USER_ID", currentUserId);
             startActivity(intent);
         });
 
 
-        dbHelper = new DatabaseHelper(this);
-        currentUserId = dbHelper.getLastInsertedUserId();
+
         User user = dbHelper.getUser(currentUserId);
         List<BankAccount> accounts = dbHelper.getBankAccounts(currentUserId);
 
