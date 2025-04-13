@@ -13,6 +13,12 @@
         android:theme="@style/Theme.PersonalFinanceManager"
         tools:targetApi="31">
         <activity
+            android:name=".TermsAndCondition"
+            android:exported="false" />
+        <activity
+            android:name=".AssetsActivity"
+            android:exported="false" />
+        <activity
             android:name=".HomeActivity"
             android:exported="false" />
         <activity

@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
         } else {
             // First time -> Go to Registration
-            startActivity(new Intent(MainActivity.this, RegistrationActivity1.class));
+            startActivity(new Intent(MainActivity.this, TermsAndCondition.class));
         }
 
         finish();

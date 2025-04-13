@@ -5,4 +5,7 @@
         <item>Outgoing</item>
     </string-array>
 
+    <string name="terms">This ia a completely offline application. We do not share your data. your data is completely private and remains on your phone. To test this you can turn off any internet connection and see that the app still works</string>
+    <string name="terms_and_conditions">Terms and Conditions</string>
+
 </resources>
