@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Personal Finance Manager</string>
+    <string name="app_name">CashWise - Personal Finance Manager</string>
     <string-array name="transaction_types">
         <item>Incoming</item>
         <item>Outgoing</item>
