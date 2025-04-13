@@ -14,15 +14,19 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class AssetsActivity extends AppCompatActivity {
 
     private DatabaseHelper dbHelper;
     private long currentUserId;
+    RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +41,14 @@ public class AssetsActivity extends AppCompatActivity {
 
         Button btnCreateFD = findViewById(R.id.btn_create_fd);
         btnCreateFD.setOnClickListener(v -> showCreateFDDialog());
+
+        recyclerView = findViewById(R.id.fd_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        List<FDModel> fdList = dbHelper.getFDsForUser(currentUserId);
+        FDAdapter adapter = new FDAdapter(fdList);
+        recyclerView.setAdapter(adapter);
+
     }
 
     private void showCreateFDDialog() {
@@ -109,10 +121,9 @@ public class AssetsActivity extends AppCompatActivity {
                 final double finalMaturityAmount = maturityAmount;
 
                 btnSave.setOnClickListener(view1 -> {
-                    // Make sure dbHelper and currentUserId are initialized
                     if (dbHelper != null) {
                         boolean success = dbHelper.insertFD(
-                                currentUserId,  // ensure this is a valid value
+                                currentUserId,
                                 finalPrincipal,
                                 finalRate,
                                 finalTimeMonths,
@@ -125,6 +136,10 @@ public class AssetsActivity extends AppCompatActivity {
                         if (success) {
                             Toast.makeText(this, "FD saved successfully!", Toast.LENGTH_SHORT).show();
                             dialog.dismiss();
+                            // Refresh RecyclerView
+                            List<FDModel> updatedList = dbHelper.getFDsForUser(currentUserId);
+                            recyclerView.setAdapter(new FDAdapter(updatedList));
+
                         } else {
                             Toast.makeText(this, "Failed to save FD", Toast.LENGTH_SHORT).show();
                         }
