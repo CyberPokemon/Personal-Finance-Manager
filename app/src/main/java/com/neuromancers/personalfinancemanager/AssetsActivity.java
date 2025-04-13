@@ -37,7 +37,7 @@ public class AssetsActivity extends AppCompatActivity {
         currentUserId = getIntent().getLongExtra("USER_ID", -1);
 
         TextView title = findViewById(R.id.txt_assets);
-        title.setText("Manage FDs h");
+        title.setText("Manage FDs");
 
         Button btnCreateFD = findViewById(R.id.btn_create_fd);
         btnCreateFD.setOnClickListener(v -> showCreateFDDialog());
