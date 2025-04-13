@@ -240,4 +240,30 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
 
+    public List<FDModel> getFDsForUser(long userId) {
+        List<FDModel> fdList = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM fd WHERE user_id = ?", new String[]{String.valueOf(userId)});
+
+        if (cursor.moveToFirst()) {
+            do {
+                FDModel fd = new FDModel();
+                fd.setId(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
+                fd.setPrincipal(cursor.getDouble(cursor.getColumnIndexOrThrow("principal")));
+                fd.setRate(cursor.getDouble(cursor.getColumnIndexOrThrow("rate")));
+                fd.setTimeMonths(cursor.getInt(cursor.getColumnIndexOrThrow("time_months")));
+                fd.setStartDate(cursor.getString(cursor.getColumnIndexOrThrow("start_date")));
+                fd.setMaturityDate(cursor.getString(cursor.getColumnIndexOrThrow("maturity_date")));
+                fd.setInterest(cursor.getDouble(cursor.getColumnIndexOrThrow("interest")));
+                fd.setMaturityAmount(cursor.getDouble(cursor.getColumnIndexOrThrow("maturity_amount")));
+                fdList.add(fd);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        return fdList;
+    }
+
+
+
 }
